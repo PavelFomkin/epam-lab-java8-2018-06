@@ -40,16 +40,16 @@ public class Exercise2 {
 
     @Test
     public void implementsMultiplierUsingStatementLambda() {
-        Multiplier<Integer> multiplier = (value, mult) -> value * mult;
+        Multiplier<Integer> multiplier = (value, mult) -> {
+            return value * mult;
+        };
 
         testIntegerMultiplier(multiplier);
     }
 
     @Test
     public void implementsIntegerMultiplierUsingExpressionLambda() {
-        Multiplier<Integer> multiplier = (value, mult) -> {
-            return value * mult;
-        };
+        Multiplier<Integer> multiplier = (value, mult) -> value * mult;
 
         testIntegerMultiplier(multiplier);
     }
