@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
@@ -41,9 +42,7 @@ public class Exercise2 {
          */
         public <R> MapHelper<R> map(Function<T, R> mapping) {
             List<R> newList = new ArrayList<>();
-            for (T t : source) {
-                newList.add(mapping.apply(t));
-            }
+            source.forEach(t -> newList.add(mapping.apply(t)));
             return from(newList);
         }
 
@@ -56,9 +55,7 @@ public class Exercise2 {
          */
         public <R> MapHelper<R> flatMap(Function<T, List<R>> flatMapping) {
             List<R> newList = new ArrayList<>();
-            for (T t : source) {
-                newList.addAll(flatMapping.apply(t));
-            }
+            source.forEach(t -> newList.addAll(flatMapping.apply(t)));
             return from(newList);
         }
     }
@@ -87,13 +84,7 @@ public class Exercise2 {
         List<Integer> codes = MapHelper.from(employees)
                 .flatMap(Employee::getJobHistory)
                 .map(JobHistoryEntry::getPosition)
-                .flatMap(s -> {
-                    List<Character> chars = new ArrayList<>();
-                    for(Character letter : s.toCharArray()){
-                        chars.add(letter);
-                    }
-                    return chars;
-                })
+                .flatMap(s ->  s.chars().boxed().collect(Collectors.toList()))
                 .map(chars -> (int) chars)
                 .getMapped();
         // TODO               MapHelper.from(employees)
