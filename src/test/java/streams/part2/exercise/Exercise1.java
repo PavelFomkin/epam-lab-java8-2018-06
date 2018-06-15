@@ -6,6 +6,7 @@ import lambda.data.Person;
 import org.junit.Test;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
@@ -17,7 +18,13 @@ public class Exercise1 {
         List<Employee> employees = getEmployees();
 
         // TODO реализация
-        Long hours = null;
+        Long hours = employees.stream()
+                .map(Employee::getJobHistory)
+                .flatMap(Collection::stream)
+                .filter(job -> job.getEmployer().equals("EPAM"))
+                .map(JobHistoryEntry::getDuration)
+                .reduce(0, (a, b) -> a + b)
+                .longValue();
 
         assertEquals(19, hours.longValue());
     }
@@ -27,7 +34,11 @@ public class Exercise1 {
         List<Employee> employees = getEmployees();
 
         // TODO реализация
-        Set<Person> workedAsQa = null;
+        Set<Person> workedAsQa = employees.stream()
+                .filter(empl -> empl.getJobHistory().stream()
+                        .anyMatch(job -> job.getPosition().equals("QA")))
+                .map(Employee::getPerson)
+                .collect(Collectors.toSet());
 
         assertEquals(new HashSet<>(Arrays.asList(
                 employees.get(2).getPerson(),
@@ -41,8 +52,10 @@ public class Exercise1 {
         List<Employee> employees = getEmployees();
 
         // TODO реализация
-        String result = null;
-
+        String result = employees.stream()
+                .map(Employee::getPerson)
+                .map(Person::getFullName)
+                .collect(Collectors.joining("\n"));
         assertEquals("Иван Мельников\n"
                 + "Александр Дементьев\n"
                 + "Дмитрий Осинов\n"
@@ -57,7 +70,17 @@ public class Exercise1 {
         List<Employee> employees = getEmployees();
 
         // TODO реализация
-        Map<String, Set<Person>> result = null;
+        Map<String, Set<Person>> result = employees.stream()
+                .map(Employee::getJobHistory)
+                .flatMap(Collection::stream)
+                .map(JobHistoryEntry::getPosition)
+                .distinct()
+                .collect(Collectors.toMap(str -> str, str -> employees.stream()
+                        .filter(empl -> empl.getJobHistory().size() > 0)
+                        .filter(empl -> empl.getJobHistory().get(0).getPosition().equals(str))
+                        .peek(empl -> System.out.println(empl.getJobHistory().get(0)))
+                        .map(Employee::getPerson)
+                        .collect(Collectors.toSet())));
 
         Map<String, Set<Person>> expected = new HashMap<>();
         expected.put("QA", new HashSet<>(Arrays.asList(employees.get(2).getPerson(), employees.get(5).getPerson())));
@@ -76,7 +99,9 @@ public class Exercise1 {
         List<Employee> employees = getEmployees();
 
         // TODO реализация
-        Map<String, Set<Person>> result = null;
+        Map<String, Set<Person>> result = employees.stream()
+                .filter(empl -> empl.getJobHistory().size() > 0)
+                .collect(Collectors.groupingBy(empl -> empl.getJobHistory().get(0).getPosition(), Collectors.mapping(Employee::getPerson, Collectors.toSet())));
 
         Map<String, Set<Person>> expected = new HashMap<>();
         expected.put("QA", new HashSet<>(Arrays.asList(employees.get(2).getPerson(), employees.get(5).getPerson())));
