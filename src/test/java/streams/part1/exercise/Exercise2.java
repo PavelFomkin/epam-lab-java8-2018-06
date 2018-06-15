@@ -5,9 +5,7 @@ import lambda.data.JobHistoryEntry;
 import lambda.data.Person;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
@@ -18,7 +16,11 @@ public class Exercise2 {
     public void calcAverageAgeOfEmployees() {
         List<Employee> employees = getEmployees();
 
-        Double expected = null;
+        Double expected = employees.stream()
+                .map(Employee::getPerson)
+                .map(Person::getAge)
+                .reduce(0, (a, b) -> a + b)
+                .doubleValue() / employees.size();
 
         assertEquals(33.66, expected, 0.1);
     }
@@ -27,7 +29,10 @@ public class Exercise2 {
     public void findPersonWithLongestFullName() {
         List<Employee> employees = getEmployees();
 
-        Person expected = null;
+        Person expected = employees.stream()
+                .map(Employee::getPerson)
+                .max(Comparator.comparing(p -> p.getFullName().length()))
+                .get();
 
         assertEquals(expected, employees.get(1).getPerson());
     }
@@ -36,7 +41,10 @@ public class Exercise2 {
     public void findEmployeeWithMaximumDurationAtOnePosition() {
         List<Employee> employees = getEmployees();
 
-        Employee expected = null;
+        Employee expected = employees.stream()
+                .max(Comparator.comparing(Employee::getJobHistory, Comparator.comparing(job -> job.stream()
+                        .map(JobHistoryEntry::getDuration).max(Integer::compareTo).orElseGet(() -> 0))))
+                .get();
 
         assertEquals(expected, employees.get(4));
     }
@@ -50,7 +58,15 @@ public class Exercise2 {
     public void calcTotalSalaryWithCoefficientWorkExperience() {
         List<Employee> employees = getEmployees();
 
-        Double expected = null;
+        final int COMMON_PRICE = 75_000;
+        final double COEFFICIENT = 1.2;
+
+        Double expected = employees.stream()
+                .map(Employee::getJobHistory)
+                .filter(jobs -> jobs.size() > 0)
+                .map(jobs -> jobs.get(jobs.size() - 1))
+                .map(job -> job.getDuration() > 3 ? COMMON_PRICE * COEFFICIENT : (double) COMMON_PRICE)
+                .reduce(0.0, (a, b) -> a + b);
 
         assertEquals(465000.0, expected, 0.001);
     }
