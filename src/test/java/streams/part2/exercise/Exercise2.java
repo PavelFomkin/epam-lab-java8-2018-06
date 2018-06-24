@@ -145,6 +145,7 @@ public class Exercise2 {
      * "T-Systems" -> [ {Анна Светличная 21} ]
      * ]
      */
+
     @Test
     public void indexByFirstEmployer() {
         List<Employee> employees = getEmployees();
@@ -167,41 +168,6 @@ public class Exercise2 {
                 employees.get(5).getPerson()
         )));
         assertEquals(expected, result);
-    }
-
-    static class TripleEmployerDurationPerson{
-        private final String employer;
-        private final Integer duration;
-        private final Person person;
-
-        public TripleEmployerDurationPerson(String employer, Integer duration, Person person) {
-
-            this.employer = employer;
-            this.duration = duration;
-            this.person = person;
-        }
-
-        String getEmployer() {
-            return employer;
-        }
-
-        public Integer getDuration() {
-            return duration;
-        }
-
-        Person getPerson() {
-            return person;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            return person.toString().equals(((TripleEmployerDurationPerson) obj).getPerson().toString()) && employer.equals(((TripleEmployerDurationPerson) obj).employer);
-        }
-
-        @Override
-        public int hashCode() {
-            return person.hashCode()+employer.hashCode();
-        }
     }
 
     /**
